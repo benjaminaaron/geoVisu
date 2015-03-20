@@ -1,0 +1,362 @@
+<html> 
+	<head> 
+		<title>geo</title> 
+		<style> 
+
+			body {
+				color: #cccccc;
+				background-color: #cccccc;
+				margin: 0px;
+			}
+
+		</style> 
+	</head> 
+	<body> 
+
+		<div id="ThreeJS" style="z-index: 1; position: absolute; left:0px; top:0px"></div>
+
+		<script src="js/three.min.js"></script> 
+		<script src="js/OrbitControls.js"></script>
+		<script>
+
+			var container, scene, camera, renderer, controls;
+
+			var size = 20;
+			var from = - size / 2;
+			var to = size / 2;
+
+			init();
+			animate();
+
+			function init() {
+
+				scene = new THREE.Scene();
+				//scene.fog = new THREE.FogExp2(0xcccccc, 0.002);
+
+				var SCREEN_WIDTH = window.innerWidth, SCREEN_HEIGHT = window.innerHeight;	
+				var VIEW_ANGLE = 45, ASPECT = SCREEN_WIDTH / SCREEN_HEIGHT, NEAR = 0.1, FAR = 20000;
+				camera = new THREE.PerspectiveCamera( VIEW_ANGLE, ASPECT, NEAR, FAR);
+				scene.add(camera);
+				camera.position.set(0,20,50);
+				camera.lookAt(scene.position);	
+
+				renderer = new THREE.WebGLRenderer({antialias:true});
+				renderer.setClearColor(0xcccccc);
+				renderer.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
+
+				container = document.getElementById('ThreeJS');
+				container.appendChild(renderer.domElement);
+
+				controls = new THREE.OrbitControls(camera, renderer.domElement);
+
+				light = new THREE.DirectionalLight(0xffffff);
+				light.position.set(1, 1, 1);
+				scene.add(light);
+				light = new THREE.DirectionalLight(0x002288);
+				light.position.set(-1, -1, -1);
+				scene.add(light);
+				light = new THREE.AmbientLight(0x222222);
+				scene.add(light);
+
+/*				var sphereGeometry = new THREE.SphereGeometry( 50, 32, 16 ); 
+				var sphereMaterial = new THREE.MeshLambertMaterial( {color: 0x8888ff} ); 
+				var sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+				sphere.position.set(0, 0, 0);
+				scene.add(sphere);
+*/
+
+				var axes = new THREE.AxisHelper(size);
+				scene.add(axes);
+
+				var cubeGeometry = new THREE.BoxGeometry(size, size, size); 
+				var cube = new THREE.BoxHelper(new THREE.Mesh(cubeGeometry));
+				cube.material.color.set(0x777777);
+				cube.position.set(0, 0, 0);
+				scene.add(cube);
+
+				//nonParamPlane(2,3,-4,-10);
+				//paramPlane(2,2,0,-2,0,-1,-1,2,1);
+
+
+				var a = 7;
+				var b = 3;
+				nonParamPlane(2,-1,3,-1);
+				nonParamPlane(1,2,-1,b);
+				nonParamPlane(1,a,-6,10);
+
+/*
+				paramLine(-1,2,2,2,1,-1);				
+				nonParamPlane(1,3,5,0);
+				showPoint(-10/7, 5/7, -1/7);
+				showPoint(-1,2,2);*/
+
+
+				//showPoint(4, 0, 0);
+
+				//quadricX5();
+
+				//taskX3();
+
+				/*var a = 7;
+				var b = 3;
+				nonParamPlane(2, -1, 3, -1);
+				nonParamPlane(1, 2, -1, b);
+				nonParamPlane(1, a, -6, 10);*/
+
+				//paramPlane(3,2,-1,-2,-1,1,-3,0,2);
+
+
+				//conicA5();
+
+			}
+
+			function randomColor(){
+				return '#' + Math.floor(Math.random() * 16777215).toString(16);
+			}
+
+			function showPoint(x, y, z){	
+				var col = randomColor();
+				var sphereGeometry = new THREE.SphereGeometry(0.6); 
+				var sphereMaterial = new THREE.MeshLambertMaterial({color: col});
+				var sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+				sphere.position.set(x, y, z);
+				scene.add(sphere);
+			}
+
+			function paramPlane(Px, Py, Pz, Vx, Vy, Vz, Ux, Uy, Uz){
+
+				var col = randomColor();
+
+				var sphere;
+				var sphereGeometry = new THREE.SphereGeometry(0.5); 
+				var sphereMaterial = new THREE.MeshLambertMaterial({color: col}); 
+
+				var lambdaFrom = -5;
+				var lambdaTo = 5;
+				var lambdaSteps = 0.2;
+				var deltaFrom = -5;
+				var deltaTo = 5;
+				var deltaSteps = 0.2;
+
+				for(var lambda = lambdaFrom; lambda <= lambdaTo; lambda = lambda + lambdaSteps){
+					for(var delta = deltaFrom; delta <= deltaTo; delta = delta + deltaSteps){
+						var sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+						var x = Px + lambda * Vx + delta * Ux;
+						var y = Py + lambda * Vy + delta * Uy;
+						var z = Pz + lambda * Vz + delta * Uz;
+						sphere.position.set(x, y, z);
+						scene.add(sphere);
+					}
+				}
+
+			}
+
+
+			function paramLine(Px, Py, Pz, Vx, Vy, Vz){
+
+				var col = randomColor();
+
+				var sphere;
+				var sphereGeometry = new THREE.SphereGeometry(0.5); 
+				var sphereMaterial = new THREE.MeshLambertMaterial({color: col}); 
+
+				var lambdaFrom = -5;
+				var lambdaTo = 5;
+				var lambdaSteps = 0.2;
+
+				for(var lambda = lambdaFrom; lambda <= lambdaTo; lambda = lambda + lambdaSteps){
+					var sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+					var x = Px + lambda * Vx;
+					var y = Py + lambda * Vy;
+					var z = Pz + lambda * Vz;
+					sphere.position.set(x, y, z);
+					scene.add(sphere);
+				}
+
+			}
+
+
+			function nonParamPlane(a, b, c, d){
+
+				var col = randomColor();
+				
+				var steps = 0.5;
+
+				var sphere;
+				var sphereGeometry = new THREE.SphereGeometry(steps); 
+				var sphereMaterial = new THREE.MeshLambertMaterial({color: col}); 
+
+				var c1 = 0, c2 = 0;
+				for(var x = from; x <= to; x = x + steps){
+					for(var y = from; y <= to; y = y + steps){
+						for(var z = from; z <= to; z = z + steps){
+							c1 ++;				
+							if(a * x + b * y + c * z + d == 0) {
+								c2 ++;
+								var sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+								sphere.position.set(x, y, z);
+								scene.add(sphere);
+							}
+						}
+					}
+				}
+				console.log('total points checked: ' + c1);
+				console.log('points plotted: ' + c2);
+				console.log(((c2 / c1) * 100).toFixed(2) + ' %');
+			}
+
+
+			function quadricX5(){
+				var col = randomColor();			
+				var steps = 0.5;
+				var sphere;
+				var sphereGeometry = new THREE.SphereGeometry(steps); 
+				var sphereMaterial = new THREE.MeshLambertMaterial({color: col}); 
+				for(var x = from; x <= to; x = x + steps){
+					for(var y = from; y <= to; y = y + steps){
+						for(var z = from; z <= to; z = z + steps){
+							if(Math.abs(7*x*x + 6*y*y + 5*z*z - 4*x*y - 4*y*z - 6*x - 24*y + 18*z + 30) < 2){
+								var sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+								sphere.position.set(x, y, z);
+								scene.add(sphere);
+							}
+						}
+					}
+				}
+			}
+
+			function conicA5(){
+				var col = randomColor();			
+				var steps = 0.1;
+				var sphere;
+				var sphereGeometry = new THREE.SphereGeometry(steps); 
+				var sphereMaterial = new THREE.MeshLambertMaterial({color: col}); 
+				for(var x = from; x <= to; x = x + steps){
+					for(var y = from; y <= to; y = y + steps){
+						if(Math.abs(x*x + y*y - 2*x*y + 10*x - 2*y + 9) < 1){
+							var sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+							sphere.position.set(x, y, 0);
+							scene.add(sphere);
+						}
+					}
+				}
+			}
+
+			function dist2D(x1, y1, x2, y2){
+				var dist = Math.sqrt(Math.pow(x2-x1,2) + Math.pow(y2-y1,2));
+				console.log(dist);
+				return dist;
+			}
+
+			function taskX3(){
+				var col = randomColor();			
+				var steps = 0.1;
+				var sphere;
+				var sphereGeometry = new THREE.SphereGeometry(steps); 
+				var sphereMaterial = new THREE.MeshLambertMaterial({color: col}); 
+
+				for(var x = from; x <= to; x = x + steps){
+					for(var y = from; y <= to; y = y + steps){
+						
+						var distFact = dist2D(0,0,x,y) / dist2D(4,0,x,y);
+						var cond = distFact > 0.95 && distFact < 1.05;
+
+						if(cond){
+							var sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+							sphere.position.set(x, y, 0);
+							scene.add(sphere);
+						}
+					}
+				}
+
+
+
+
+			}
+
+			function animate() {
+			    requestAnimationFrame(animate);
+				render();		
+				//update();
+			}
+
+			function render() {	
+				renderer.render(scene, camera);
+			}
+		
+
+
+/*				var  textGeo = new THREE.TextGeometry('Y', {
+				        size: 5,
+				        height: 2,
+				        curveSegments: 6,
+				        font: "Helvetiker",
+				        style: "normal"
+
+				    });
+				var  color = new THREE.Color();
+				color.setRGB(255, 250, 250);
+				var  textMaterial = new THREE.MeshBasicMaterial({ color: color });
+				var  text = new THREE.Mesh(textGeo , textMaterial);
+
+				text.position.x = axis.geometry.vertices[1].x;
+				text.position.y = axis.geometry.vertices[1].y;
+				text.position.z = axis.geometry.vertices[1].z;
+				text.rotation = camera.rotation;
+				scene.add(text);*/
+
+	/*		var scene = new THREE.Scene(); 
+			var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000); 
+			var renderer = new THREE.WebGLRenderer(); 
+			renderer.setSize(window.innerWidth, window.innerHeight); 
+			document.body.appendChild(renderer.domElement);
+
+			var geometry = new THREE.BoxGeometry(1, 1, 1); 
+			var material = new THREE.MeshBasicMaterial({ color: 0x00ff00 }); 
+			var cube = new THREE.Mesh(geometry, material); 
+			//scene.add(cube); 
+
+
+			var material = new THREE.LineBasicMaterial({color: 0xff0000});
+			var geometry = new THREE.Geometry();
+			geometry.vertices.push(
+				new THREE.Vector3(-5, 0, 0),
+				new THREE.Vector3(5, 0, 0),
+				new THREE.Vector3(0, 0, 0),
+				new THREE.Vector3(0, -5, 0),
+				new THREE.Vector3(0, 5, 0),			
+				new THREE.Vector3(0, 0, 0),
+				new THREE.Vector3(0, 0, -5),
+				new THREE.Vector3(0, 0, 5)
+			);
+			var line = new THREE.Line(geometry, material);
+			scene.add(line);
+
+
+			var material = new THREE.MeshBasicMaterial({color: 0xffff00});
+			var geometry = new THREE.Geometry();
+			geometry.vertices.push(
+				new THREE.SphereGeometry(0.2);
+			
+
+			var sphere = new THREE.Mesh(geometry, material);
+			scene.add(sphere);
+
+
+			camera.position.z = 10;
+
+			function render() { 
+				requestAnimationFrame(render); 
+				//cube.rotation.x += 0.01; 
+				//cube.rotation.y += 0.01;
+				line.rotation.x += 0.01; 
+				line.rotation.y += 0.01;
+				sphere.rotation.x += 0.01; 
+				sphere.rotation.y += 0.01;
+				renderer.render(scene, camera); 
+			} 
+			render();*/
+
+		</script>
+	</body> 
+</html>

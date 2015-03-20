@@ -1,0 +1,127 @@
+<html> 
+	<head> 
+		<title>geo</title> 
+		<style> 
+		</style> 
+	</head> 
+	<body> 
+
+
+		<canvas id="canvas" width="800" height="600"></canvas>
+
+		<script>
+
+			function dist(x1, y1, x2, y2){
+				return Math.sqrt(Math.pow(x2-x1,2) + Math.pow(y2-y1,2));
+			}
+
+			var k = 0;
+			var xMin = -4;
+			var xMax = 4;
+			var yMin = -3;
+			var yMax = 3;
+
+			var F1x = -1;
+			var F1y = 0;
+			var F2x = 1;
+			var F2y = 0;
+
+
+			function init(){
+			  	window.requestAnimationFrame(draw);
+			}
+
+			function draw() {
+			 	var ctx = document.getElementById('canvas').getContext('2d');
+			  	ctx.clearRect(0,0,800,600);
+				ctx.strokeStyle = 'silver';			 	
+				ctx.save();
+
+
+				ctx.font="20px Georgia";
+				ctx.fillStyle = 'blue';
+				ctx.fillText('hyperbola: ||XF1| - |XF2|| = 2a', 10, 40);
+				ctx.fillStyle = 'red';
+				ctx.fillText('ellipse: |XF1| + |XF2| = 2a', 10, 70);	
+
+				ctx.fillStyle = 'gray';
+				ctx.font="25px Georgia";
+				ctx.fillText("2a = " + Math.round(k * 100) / 100, 10, 120);
+
+				ctx.translate(400,300);
+
+				ctx.beginPath();
+				ctx.moveTo(xMin * 100,0);
+				ctx.lineTo(xMax * 100,0);
+				ctx.stroke();
+
+				ctx.beginPath();
+				ctx.moveTo(0,yMin * 100);
+				ctx.lineTo(0,yMax * 100);
+				ctx.stroke();
+
+				ctx.fillStyle = 'gray';
+				ctx.font="14px Georgia";
+
+				//F1
+				ctx.beginPath();
+				ctx.arc(F1x * 100, F1y * 100, 7, 0, Math.PI*2); 
+				ctx.closePath();
+				ctx.fill();
+				ctx.fillText('(' + F1x + ',' + F1y + ')',F1x * 100 - 16,F1y * 100 + 20);
+
+
+				//F2
+				ctx.beginPath();
+				ctx.arc(F2x * 100, F2y * 100, 7, 0, Math.PI*2); 
+				ctx.closePath();
+				ctx.fill();
+				ctx.fillText('(' + F2x + ',' + F2y + ')',F2x * 100 - 16,F2y * 100 + 20);
+
+				var steps = 0.05;
+				var flex = 0.03;
+
+				for(var x = xMin; x <= xMax; x = x + steps){
+					for(var y = yMin; y <= yMax; y = y + steps){
+						
+						var ellipseVal = dist(F1x,F1y,x,y) + dist(F2x,F2y,x,y);
+						var ellipseCond = ellipseVal > k - flex && ellipseVal < k + flex;
+						if(ellipseCond){
+							ctx.fillStyle = 'red';
+							ctx.beginPath();
+							ctx.arc(x * 100, y * 100, 3, 0, Math.PI*2); 
+							ctx.closePath();
+							ctx.fill();
+						}
+
+						var hyperbolaVal = Math.abs(dist(F1x,F1y,x,y) - dist(F2x,F2y,x,y));
+
+						var hyperbolaCond = hyperbolaVal > k - flex && hyperbolaVal < k + flex;
+						if(hyperbolaCond){
+							ctx.fillStyle = 'blue';
+							ctx.beginPath();
+							ctx.arc(x * 100, y * 100, 3, 0, Math.PI*2); 
+							ctx.closePath();
+							ctx.fill();
+						}
+
+
+					}
+				}
+
+				ctx.restore();
+
+				k = k + 0.005;
+
+				if(k > 5)
+					k = 0;
+
+			  window.requestAnimationFrame(draw);
+			}
+
+			init();
+
+		</script>
+
+	</body> 
+</html>
